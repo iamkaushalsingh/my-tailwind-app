@@ -7,7 +7,13 @@ import axios from "axios";
 
 const app = express();
 app.use(json());
-app.use(cors());
+
+const corsOptions = {
+  origin: "http://localhost:5173", // Adjust if using a different frontend port
+  methods: ["POST"],
+  allowedHeaders: ["Content-Type"],
+};
+app.use(cors(corsOptions));
 
 const PORT = process.env.PORT || 5001;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
