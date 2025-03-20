@@ -1,32 +1,29 @@
-import dotenv from "dotenv";
-dotenv.config();
-
 import express, { json } from "express";
 import cors from "cors";
 import axios from "axios";
+
+if (process.env.NODE_ENV !== "production") {
+  import("dotenv").then((dotenv) => dotenv.config());
+}
 
 const app = express();
 app.use(json());
 
 const corsOptions = {
-  origin: "http://localhost:5173", // Adjust if using a different frontend port
+  origin: process.env.FRONTEND_URL || "http://localhost:5173", // Update this in your environment variables
   methods: ["POST"],
   allowedHeaders: ["Content-Type"],
 };
 app.use(cors(corsOptions));
 
-const PORT = process.env.PORT || 5001;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const MODEL_NAME = "gemini-1.5-flash"; // or "gemini-1.5-pro"
+const MODEL_NAME = "gemini-1.5-flash";
 
 // Function to format AI response
 const formatResponse = (text) => {
   if (!text) return "⚠️ No response from AI.";
 
-  // Add new lines after full stops for readability
   let formattedText = text.replace(/\. /g, ".\n\n");
-
-  // Convert lists into bullet points if AI generates structured responses
   formattedText = formattedText.replace(/\n- /g, "\n\n- ");
 
   return formattedText;
@@ -61,4 +58,5 @@ app.post("/chat", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// ✅ Export Express app as a function (For Vercel)
+export default app;
